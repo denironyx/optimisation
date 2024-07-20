@@ -19,7 +19,22 @@ This problem is a question of how the salesman should navigate for the shortest 
   -  Constraints : Money in your pocket
   -  Indicator (value) : Total degree of satisfaction
 - Vehicle Routing Problem:
-- 
+
+
+Metaheuristics:
+- Heuristics: a technique which seeks optimal or near-optimal solutions at a reasonable computational cost.
+
+Metaheuristics are heuristics that are inspirted by nature and are not problem specific
+
+The space of possible solutions is typically too large to search exhaustively using pure brute force. In some cases, problems can be solved exactly using Branch and Bound techniques. However, in other cases no exact algorithms are feasible, and randomized search algorithms must be employed, such as:
+- Ant colony optimization
+- Simulated annealing
+- Genetic algorithms
+- Tabu search
+- Particle Swarm Optimisation
+
+A large part of the field of Operations Research involves algorithms for solving combinatorial optimization problems
+
 
 References:
 - https://annealing-cloud.com/en/knowledge/1.html#traveling-salesman-problem
