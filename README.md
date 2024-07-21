@@ -24,7 +24,7 @@ This problem is a question of how the salesman should navigate for the shortest 
 Metaheuristics:
 - Heuristics: a technique which seeks optimal or near-optimal solutions at a reasonable computational cost.
 
-Metaheuristics are heuristics that are inspirted by nature and are not problem specific
+Metaheuristics are heuristics that are inspired by nature and are not problem specific
 
 The space of possible solutions is typically too large to search exhaustively using pure brute force. In some cases, problems can be solved exactly using Branch and Bound techniques. However, in other cases no exact algorithms are feasible, and randomized search algorithms must be employed, such as:
 - Ant colony optimization
