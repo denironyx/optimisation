@@ -36,6 +36,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return c * r
 
 distance_matrix = pd.DataFrame(index = locations.index, columns=locations.index)
+
 for i in locations.index:
     for j in locations.index:
         if i != j:
@@ -50,4 +51,31 @@ plt.xlabel('Longitude')
 plt.ylabel('Latitude')
 plt.title('Delivery points')
 plt.show()
+
+## Define cost and time functions
+# Parameters
+vehicle_capacity = 1000 # kg
+cost_per_km = 2.0 # cost per km
+average_speed = 50.0 # km/h
+
+# Define demand (example values)
+demand = {f'Farm{i}': 200 + i * 50 for i in range(num_farms)}
+demand.update({f'Supermarket{i}': 150 + i * 30 for i in range(num_supermarkets)})
+demand.update({f'Warehouse{i}': 0 for i in range(num_warehouses)})
+
+def calculate_total_distance(route, distance_matrix):
+    distance = 0
+    for i in range(len(route) - 1):
+        distance += distance_matrix.loc[route[i], route[i + 1]]
+    distance += distance_matrix.loc[route[-1], route[0]]  # Return to the start
+    return distance
+
+def calculate_cost(route, distance_matrix, cost_per_km):
+    total_distance = calculate_total_distance(route, distance_matrix)
+    return total_distance * cost_per_km
+
+def calculate_time(route, distance_matrix, average_speed):
+    total_distance = calculate_total_distance(route, distance_matrix)
+    return total_distance / average_speed
+
 
