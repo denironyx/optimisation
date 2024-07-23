@@ -5,7 +5,13 @@ from math import radians, cos, sin, asin, sqrt
 import matplotlib.pyplot as plt
 
 """
-This is a travel sales man problem with no constraints as regards direction. 
+This is a travel sales man problem with no constriants as regards direction. 
+Next stage would be to include constraints suchs as a driver needs to visit a farm after making a trip for 
+6hrs it stops at the closest warehouse and another driver takes the goods to the supermarket. 
+
+The only time a driver is expected to take the goods from farm to super market is if the journey is about 6hrs. 
+If it's morethan that, it has to drop it at the closest warehouse. 
+
 """
 
 # Generate random coordinates for farms, storage warehouses, and supermarkets
