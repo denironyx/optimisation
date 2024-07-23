@@ -5,12 +5,18 @@ from math import radians, cos, sin, asin, sqrt
 import matplotlib.pyplot as plt
 
 """
-This is a travel sales man problem with no constriants as regards direction. 
-Next stage would be to include constraints suchs as a driver needs to visit a farm after making a trip for 
-6hrs it stops at the closest warehouse and another driver takes the goods to the supermarket. 
+This is a travel sales man problem with defined constraints. 
 
-The only time a driver is expected to take the goods from farm to super market is if the journey is about 6hrs. 
-If it's morethan that, it has to drop it at the closest warehouse. 
+Define the Constraints:
+A driver can only drive for a maximum of 6 hours before stopping at a warehouse.
+If a trip from a farm to a supermarket exceeds 6 hours, the driver must stop at the nearest warehouse, and another driver will take over.
+
+Modify the Simulated Annealing Algorithm:
+Update the algorithm to include a check for the total driving time from the farm to the supermarket.
+Include stops at the nearest warehouse if the total driving time exceeds 6 hours.
+
+Plot the Route:
+Visualize the route with stops at warehouses and changes in drivers.
 
 """
 
@@ -35,7 +41,12 @@ locations = pd.DataFrame(np.vstack([farm_coords, warehouse_coords, supermarket_c
                                [f'Warehouse{i}' for i in range(num_warehouses)] +
                                [f'Supermarket{i}' for i in range(num_supermarkets)])
 
-# Compute the distance matrix
+## Compute the distance matrix
+
+"""
+This haversine function calculates the great-circle distance between two points on the Earth
+specified by their latitude and longitude using the Haversine formula
+"""
 def haversine(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
@@ -67,6 +78,7 @@ plt.show()
 vehicle_capacity = 1000 # kg
 cost_per_km = 2.0 # cost per km
 average_speed = 50.0 # km/h
+max_drive_time = 6 # hours
 
 # Define demand (example values)
 demand = {f'Farm{i}': 200 + i * 50 for i in range(num_farms)}
@@ -96,13 +108,11 @@ def initial_route(locations):
     random.shuffle(route)
     return route
 
-
 def acceptance_probability(current_cost, neighbor_cost, temperature):
     if neighbor_cost < current_cost:
         return 1.0
     else:
         return np.exp((current_cost - neighbor_cost) / temperature)
-
 
 def generate_neighbor(route):
     neighbor = route[:]
@@ -110,22 +120,47 @@ def generate_neighbor(route):
     neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
     return neighbor
 
+def find_nearest_warehouse(current_location, warehouse_coords):
+    min_distance = float('inf')
+    nearest_warehouse = None
+    for warehouse in warehouse_coords.index:
+        distance = distance_matrix.loc[current_location, warehouse]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_warehouse = warehouse
+    return nearest_warehouse
 
-def simulated_annealing(locations, distance_matrix, initial_temp, cooling_rate):
+def simulated_annealing_with_constraints(locations, distance_matrix, initial_temp, cooling_rate, max_drive_time, average_speed):
     current_solution = initial_route(locations)
     best_solution = current_solution
     current_temp = initial_temp
 
     while current_temp > 1:
         neighbor_solution = generate_neighbor(current_solution)
+
+        # Apply constraints
+        total_time = 0
+        route_with_stops = []
+        for i in range(len(neighbor_solution) - 1):
+            start = neighbor_solution[i]
+            end = neighbor_solution[i + 1]
+            travel_time = distance_matrix.loc[start, end] / average_speed
+            if total_time + travel_time > max_drive_time:
+                nearest_warehouse = find_nearest_warehouse(start, warehouse_coords)
+                route_with_stops.append(nearest_warehouse)
+                total_time = travel_time
+            else:
+                total_time += travel_time
+            route_with_stops.append(start)
+        route_with_stops.append(neighbor_solution[-1])
+
         current_cost = calculate_cost(current_solution, distance_matrix, cost_per_km)
-        neighbor_cost = calculate_cost(neighbor_solution, distance_matrix, cost_per_km)
+        neighbor_cost = calculate_cost(route_with_stops, distance_matrix, cost_per_km)
 
         if acceptance_probability(current_cost, neighbor_cost, current_temp) > random.random():
-            current_solution = neighbor_solution
+            current_solution = route_with_stops
 
-        if calculate_total_distance(current_solution, distance_matrix) < calculate_total_distance(best_solution,
-                                                                                                  distance_matrix):
+        if calculate_total_distance(current_solution, distance_matrix) < calculate_total_distance(best_solution, distance_matrix):
             best_solution = current_solution
 
         current_temp *= cooling_rate
@@ -142,15 +177,16 @@ cooling_rate = 0.995
 initial_solution = list(locations.index)
 
 # Run Simulated Annealing
-optimized_route_sa = simulated_annealing(initial_solution, distance_matrix, initial_temp, cooling_rate)
+optimized_route_sa = simulated_annealing_with_constraints(initial_solution, distance_matrix, initial_temp, cooling_rate, max_drive_time, average_speed)
 
 # Calculate metrics
 optimized_distance_sa = calculate_total_distance(optimized_route_sa, distance_matrix)
 optimized_cost_sa = calculate_cost(optimized_route_sa, distance_matrix, cost_per_km)
 optimized_time_sa = calculate_time(optimized_route_sa, distance_matrix, average_speed)
 
-print("\nSimulated Annealing Results:")
+print("\nSimulated Annealing Results with Constraints:")
 print("Optimized Route:", optimized_route_sa)
 print("Optimized Distance (km):", optimized_distance_sa)
 print("Optimized Cost ($):", optimized_cost_sa)
 print("Optimized Time (hours):", optimized_time_sa)
+
