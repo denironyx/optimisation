@@ -190,3 +190,48 @@ print("Optimized Distance (km):", optimized_distance_sa)
 print("Optimized Cost ($):", optimized_cost_sa)
 print("Optimized Time (hours):", optimized_time_sa)
 
+### Visualization
+
+# List of warehouse labels
+warehouse_labels = [f'Warehouse{i}' for i in range(num_warehouses)]
+
+
+def plot_route_with_stops(locations, route, warehouse_labels):
+    # Extract coordinates for plotting
+    coords = locations.loc[route]
+    latitudes = coords['Latitude'].values
+    longitudes = coords['Longitude'].values
+
+    # Plot the delivery points
+    plt.figure(figsize=(12, 8))
+    plt.scatter(longitudes, latitudes, color='red', marker='o')
+
+    # Annotate the delivery points
+    for i, point in enumerate(route):
+        plt.annotate(point, (longitudes[i], latitudes[i]), textcoords="offset points", xytext=(0, 10), ha='center')
+
+    # Plot the route with stops
+    for i in range(len(route) - 1):
+        start = route[i]
+        end = route[i + 1]
+        start_coords = locations.loc[start]
+        end_coords = locations.loc[end]
+        if start in warehouse_labels or end in warehouse_labels:
+            line_style = 'dotted'
+            color = 'green'
+        else:
+            line_style = 'solid'
+            color = 'blue'
+        plt.plot([start_coords['Longitude'], end_coords['Longitude']],
+                 [start_coords['Latitude'], end_coords['Latitude']],
+                 color=color, linestyle=line_style, linewidth=2)
+
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.title('Optimized Delivery Route with Stops')
+    plt.grid(True)
+    plt.show()
+
+
+# Plot the optimized route with stops
+plot_route_with_stops(locations, optimized_route_sa, warehouse_labels)
