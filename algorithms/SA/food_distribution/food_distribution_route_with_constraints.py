@@ -135,6 +135,9 @@ def simulated_annealing_with_constraints(locations, distance_matrix, initial_tem
     best_solution = current_solution
     current_temp = initial_temp
 
+    # store the details of each segment
+    trip_details = []
+
     while current_temp > 1:
         neighbor_solution = generate_neighbor(current_solution)
 
@@ -148,10 +151,24 @@ def simulated_annealing_with_constraints(locations, distance_matrix, initial_tem
             if total_time + travel_time > max_drive_time:
                 nearest_warehouse = find_nearest_warehouse(start, warehouse_coords)
                 route_with_stops.append(nearest_warehouse)
+                trip_details.append({
+                    'Start': start,
+                    'End': nearest_warehouse,
+                    'Distance': distance_matrix.loc[start, nearest_warehouse],
+                    'Cost': distance_matrix.loc[start, nearest_warehouse] * cost_per_km,
+                    'Time': distance_matrix.loc[start, nearest_warehouse] / average_speed
+                })
                 total_time = travel_time
             else:
                 total_time += travel_time
             route_with_stops.append(start)
+            trip_details.append({
+                'Start': start,
+                'End': end,
+                'Distance': distance_matrix.loc[start, end],
+                'Cost': distance_matrix.loc[start, end] * cost_per_km,
+                'Time': distance_matrix.loc[start, end] / average_speed
+            })
         route_with_stops.append(neighbor_solution[-1])
 
         current_cost = calculate_cost(current_solution, distance_matrix, cost_per_km)
@@ -165,7 +182,7 @@ def simulated_annealing_with_constraints(locations, distance_matrix, initial_tem
 
         current_temp *= cooling_rate
 
-    return best_solution
+    return best_solution, trip_details
 
 
 ## Run the Optimization and Calculate cost
@@ -177,7 +194,10 @@ cooling_rate = 0.995
 initial_solution = list(locations.index)
 
 # Run Simulated Annealing
-optimized_route_sa = simulated_annealing_with_constraints(initial_solution, distance_matrix, initial_temp, cooling_rate, max_drive_time, average_speed)
+optimized_route_sa, trip_details_sa = simulated_annealing_with_constraints(initial_solution, distance_matrix, initial_temp, cooling_rate, max_drive_time, average_speed)
+
+# Convert trip details to Dataframe
+trip_details_df_sa = pd.DataFrame(trip_details_sa)
 
 # Calculate metrics
 optimized_distance_sa = calculate_total_distance(optimized_route_sa, distance_matrix)
@@ -189,6 +209,10 @@ print("Optimized Route:", optimized_route_sa)
 print("Optimized Distance (km):", optimized_distance_sa)
 print("Optimized Cost ($):", optimized_cost_sa)
 print("Optimized Time (hours):", optimized_time_sa)
+
+# Display trip lifecycle details
+print("\nTrip Lifecycle Details:")
+print(trip_details_df_sa)
 
 ### Visualization
 
