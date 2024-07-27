@@ -111,8 +111,6 @@ for i in range(M):
     
     
 
-print
-print
 print("Final Solution is: ", X0)
 print("Minimized Distance at Final Solution is: ", Len_X0)
 
