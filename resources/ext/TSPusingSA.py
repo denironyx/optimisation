@@ -105,15 +105,9 @@ for i in range(M):
     Min_Distance = np.append(Min_Distance,Len_Xtemp) # Append costs for visualization
     
     T0 = Alpha*T0 # Decrease the temp.
-    
-    
-    
-    
-    
 
 print("Final Solution is: ", X0)
 print("Minimized Distance at Final Solution is: ", Len_X0)
-
 
 plt.plot(Temp,Min_Distance)
 plt.title("Distance vs. Temperature",fontsize=20,fontweight='bold')

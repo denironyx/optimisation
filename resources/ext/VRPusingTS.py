@@ -455,8 +455,6 @@ print("Trucks' Capacities:",Caps_Sum_One_By_One)
 print()
 print("At Iteration #:",Index_for_Best)
 
-
-
 To_Plot = np.flip(Save_Solutions_Here, 0)
 
 

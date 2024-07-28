@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import scipy.spatial.distance as ssd
 import random as rd
 
-
 # X coordinates of the customers and the warehouse
 X_Coordinations = np.array([82,82,82,82,82,82,82,82,82,82,96,50,49,13,29,
                             58,84,14,2,3,5,98,84,61,1,88,91,19,93,50,98,5,42,61,9,80,57,23,20,85,98])
@@ -95,8 +94,6 @@ def Penalty_1(Array,Penalty_Value):
     Penalty_M_1 = How_Much_Extra * Penalty_Value
     return Penalty_M_1
 
-
-
 def Penalty_2(Array,Penalty_Value_1,Penalty_Value_2):
     Add_Penalties = []
     if Array[0] not in range(11): # If first element in array was not a warehouse
@@ -123,8 +120,6 @@ def Penalty_2(Array,Penalty_Value_1,Penalty_Value_2):
         t = t+1
     Sum_Add_Penalties = sum(Add_Penalties)
     return Sum_Add_Penalties
-
-
 
 def Penalty_3(Array,Penalty_Value):
     Add_Penalties = []
